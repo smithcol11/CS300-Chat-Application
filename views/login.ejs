@@ -59,7 +59,7 @@
         var form = document.getElementById("login");
         form.addEventListener("submit", (e) => {
           document.cookie = username.value;
-          socket.emit('user', document.getElementById('username').value)
+          socket.emit('user', document.getElementById('username').value);
         })
       </script>
   </form>

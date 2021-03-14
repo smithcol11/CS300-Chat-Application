@@ -145,12 +145,24 @@ io.on('connection', (socket) => {
   console.log('user connected');
 
   // loads data from the database to be emitted using socket.io
-  Message.find((err, data) => {
-    if(err)
-      console.log(err)
-    else
-      socket.emit('load', data)
-  });
+  socket.on("loadMessage", function() {
+    Message.find((err, data) => {
+      if(err)
+        console.log(err)
+      else
+        socket.emit('load', data)
+    });
+  })
+
+  socket.on("loadRoom", function(room) {
+    Group.find((err, data) => {
+      if(err)
+        console.log(err)
+      else
+        socket.emit('load', ({ data, room }))
+    });
+    
+  })
 
   var bot = 'Czat Bot: ';
 
@@ -175,42 +187,53 @@ io.on('connection', (socket) => {
   })
 
   socket.on("joinRoom", ({ username, room}) =>{
-    console.log(username + " " + room);
-    console.log(socket.id);
+    const userF = userExit(socket.id);
+    if (userF) {
+      console.log("user: " + userF.username + " room: " + userF.room);
+      socket.leave(userF.room);
+      socket.broadcast.to(userF.room).emit('message',formatMessage(bot, `${userF.username} has left the chat`));
+    }
     const user = userJoin(socket.id, username, room);
-    socket.join(room);
+    console.log("user: " + user.username + " room: " + user.room);
+    socket.join(user.room);
     socket.emit("message", formatMessage(bot,"Welcome to Czat"));
-    socket.broadcast.to(room).emit("message", formatMessage(bot, `${user.username} has joined the chat.`), room);
+    socket.broadcast.to(user.room).emit("message", formatMessage(bot, `${user.username} has joined the chat.`));
     io.to(user.room).emit('roomUsers', {room: user.room, users: getRoomUser(user.room)});
   })
 
   socket.on('chat message', ( {msg, room} ) => {
-    console.log('message: ' + msg);
     const user = getCurrentUser(socket.id);
-    console.log("room " + room);
-    io.to(room).emit('message', formatMessage(user.username, msg), room);
+    console.log("user: " + user.username + " room: " + room +' message: ' + msg);
+    io.to(room).emit('message', formatMessage(user.username, msg));
     var message = formatMessage(user.username, msg);
     const newMessage = new Message({
-      sender: message.username,
-      message: message.username + " " + message.time + ": " + message.text,
+      username: message.username,
+      message: message.text,
       time: message.time,
     });
     newMessage.save();
   });
 
-  socket.on("group", (grp) => {
-    console.log("group: " + grp);
+  socket.on("group", ({ msg, room }) => {
+    const user = getCurrentUser(socket.id);
+    var message = formatMessage(user.username, msg);
+    io.to(room).emit('message', formatMessage(user.username, msg));
     const newGroup = new Group({
-      name: grp
+      name: room,
+      username: message.username,
+      text: message.text,
+      time: message.time,
     })
+    newGroup.save();
   })
   
   socket.on('disconnect', () => {
     const user = userExit(socket.id);
 
     if (user) {
+      socket.leave(user.room);
       io.to(user.room).emit('message',formatMessage(bot, `${user.username} has left the chat`));
       //io.to(user.room).emit('roomUsers', {room: user.room, users: getRoomUser(user.room)});
     }
   });
-});
+})
