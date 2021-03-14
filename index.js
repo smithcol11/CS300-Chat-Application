@@ -3,11 +3,24 @@ const app = express();
 const port = process.env.PORT || 3000
 const session = require("express-session");
 const LocalStrategy = require("passport-local");
-const passportLocalMongoose = require("passport-local-mongoose");
 const User = require("./model/User");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const passport = require("passport");
+const moment = require('moment');
+const http = require("http");
+const {
+  formatMessageDB,
+  formatMessage
+ } = require("./utils/messages");
+const {
+  getCurrentUser,
+  userJoin, 
+  userExit,
+  getRoomUser 
+} = require("./utils/users");
+const { time } = require("console");
+const Group = require("./model/Group");
 
 require("dotenv").config();
 
@@ -30,7 +43,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    maxAge: 2*60*1000
+
   }
 }));
 
@@ -57,16 +70,25 @@ function isLoggedIn(req,res,next) {
 }
 
 app.get('/', (req, res) => {
-  //res.sendFile(__dirname + '/index.html');
   res.render("home");
 });
 
 app.get("/index", function(req, res) {
-  res.render("index");
+  res.render("home");
+});
+
+app.get("/index-Czat", function(req, res) {
+  res.render("index", {username: req.user.username});
 });
 
 app.get("/login", function(req, res) {
-  res.render("login");
+  var temp = true;
+  res.render("login", {fail: temp});
+});
+
+app.get("/login-fail", function(req, res) {
+  var temp = false;
+  res.render("login", {fail: temp});
 });
 
 app.get("/about", function(req, res) {
@@ -74,14 +96,14 @@ app.get("/about", function(req, res) {
 });
 
 app.post("/login", passport.authenticate("local", {
-  successRedirect: "/index",
-  failureRedirect: "/login"
+  successRedirect: "/index-Czat",
+  failureRedirect: "/login-fail"
 }),
   function(req, res) {
 });
 
 app.get("/register", function(req, res) {
-  res.render("register");
+  res.render("register", {exist: "no"});
 });
 
 app.post("/register",(req,res)=>{
@@ -89,10 +111,10 @@ app.post("/register",(req,res)=>{
   User.register(new User({username: req.body.username,}),req.body.password,function(err,user){
       if(err){
           console.log(err);
-          res.render("register");
+          res.render("register", {exist: "yes"});
       }
   passport.authenticate("local")(req,res,function(){
-      res.redirect("/login");
+      res.redirect("/index-Czat");
   })    
   })
 })
@@ -102,10 +124,12 @@ app.get("/logout", function (req, res) {
   res.redirect("/login"); 
 }); 
 
-function isLoggedIn(req, res, next) { 
+function LoggedIn(req, res, next) { 
   if (req.isAuthenticated()) return next(); 
   res.redirect("/login"); 
 } 
+
+passport.session
 
 const server = app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
@@ -117,22 +141,76 @@ require("./model/Message")
 const Message = mongoose.model("Message");
 
 io.on('connection', (socket) => {
+
   console.log('user connected');
 
-  socket.on('chat message', (msg) => {
-    console.log('message: ' + msg);
+  // loads data from the database to be emitted using socket.io
+  Message.find((err, data) => {
+    if(err)
+      console.log(err)
+    else
+      socket.emit('load', data)
   });
 
-  socket.on('chat message', (msg) => {
-    io.emit('chat message', msg);
+  var bot = 'Czat Bot: ';
 
+  /*io.use((socket, next) => {
+    const user = socket.handshake.auth.user;
+    socket.user = user;
+    next();
+  })*/
+
+  const users = [];
+  socket.on("user", function(data) {
+    socket.emit("user", data);
+    console.log("username: " + data);
+    if(users.indexOf(data) > -1) {
+      socket.emit('userSet', {username: data})
+    }
+    else {
+      users.push(data);
+      socket.emit('userSet', {username: data})
+    }
+
+  })
+
+  socket.on("joinRoom", ({ username, room}) =>{
+    console.log(username + " " + room);
+    console.log(socket.id);
+    const user = userJoin(socket.id, username, room);
+    socket.join(room);
+    socket.emit("message", formatMessage(bot,"Welcome to Czat"));
+    socket.broadcast.to(room).emit("message", formatMessage(bot, `${user.username} has joined the chat.`), room);
+    io.to(user.room).emit('roomUsers', {room: user.room, users: getRoomUser(user.room)});
+  })
+
+  socket.on('chat message', ( {msg, room} ) => {
+    console.log('message: ' + msg);
+    const user = getCurrentUser(socket.id);
+    console.log("room " + room);
+    io.to(room).emit('message', formatMessage(user.username, msg), room);
+    var message = formatMessage(user.username, msg);
     const newMessage = new Message({
-      message: msg
+      sender: message.username,
+      message: message.username + " " + message.time + ": " + message.text,
+      time: message.time,
     });
     newMessage.save();
   });
+
+  socket.on("group", (grp) => {
+    console.log("group: " + grp);
+    const newGroup = new Group({
+      name: grp
+    })
+  })
   
   socket.on('disconnect', () => {
-    console.log('user disconnected');
+    const user = userExit(socket.id);
+
+    if (user) {
+      io.to(user.room).emit('message',formatMessage(bot, `${user.username} has left the chat`));
+      //io.to(user.room).emit('roomUsers', {room: user.room, users: getRoomUser(user.room)});
+    }
   });
 });

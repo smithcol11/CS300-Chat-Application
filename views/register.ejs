@@ -4,13 +4,14 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
 
 <style>
   h1 {
     padding: 20px;
   }
   body {
-    padding: 20px;
+    padding: 0px;
 
   }
   form {
@@ -20,7 +21,7 @@
 
 <title>Czat - Register</title>
 
-<h1 class="bg-dark text-light">Sign Up Form</h1> 
+<h1 class="bg-dark text-light">Register</h1> 
 
 <nav class="navbar navbar-expand-sm bg-danger navbar-dark">
   <ul class="navbar-nav">
@@ -38,23 +39,41 @@
     </li>
   </ul>
 </nav>
-  
-<p class="container-fluid">
-  Please use this form to register.
-  Username & Password must be at least 1 character each.
-</p>
+<p style="margin-top: 100px;"></p>
+<div class="container-fluid shadow-lg p-4 bg-white w-50 h-50 my-auto mx-auto" style="max-width: 500px;">
+  <form action="/register" method="POST" class="container needs-validation w-75" style="max-width: 500px; margin-top: 20%"> 
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input type="text" class="form-control" id="username" name="username" required>
+    </div>
+    <p></p>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" class="form-control" id="password" name="password" required> 
+    </div>
+    <p></p>
+      <button type="submit" class="btn btn-success">Register</button> 
+      <script>
+        var socket = io();
 
-<form action="/register" method="POST" class="needs-validation"> 
-  <div class="form-group">
-    <label for="username">Username</label>
-    <input type="text" class="form-control" id="username" name="username">
+        var username = document.getElementById("username");
+        var form = document.getElementById("login");
+        form.addEventListener("submit", (e) => {
+          document.cookie = username.value;
+          socket.emit('user', document.getElementById('username').value)
+        })
+      </script>
+  </form> 
+  <div class="container-fluid" style="margin-left: 10%; margin-top: 50px;">
+    <p class="alert alert-danger" id="fail" style="display: none;">
+      <strong>Failure:</strong> User already exists, please try again.
+    </p>
+    <script>
+      var exist = "<%= exist %>"
+      if(exist == "yes") {
+        document.getElementById('fail').style.display = "inline";
+      }
+    </script>
   </div>
-  <p></p>
-  <div class="form-group">
-    <label for="password">Password</label>
-    <input type="password" class="form-control" id="password" name="password"> 
-  </div>
-  <p></p>
-    <button type="submit" class="btn btn-primary">Submit</button> 
-    <a href="/login" class="btn btn-success" role="button">Login</a>
-</form> 
+</div>
+

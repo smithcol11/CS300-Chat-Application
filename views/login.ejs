@@ -4,13 +4,14 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
 
 <style>
   h1 {
     padding: 20px;
   }
   body {
-    padding: 20px;
+    padding: 0px;
   }
   form {
     margin-right: 75%;
@@ -37,22 +38,41 @@
     </li>
   </ul>
 </nav>
+<p style="margin-top: 100px"></p>
+<div class="container-fluid shadow-lg p-4 bg-white w-50 h-50 my-auto mx-auto" style="max-width: 500px;">
+  <form id="login" action="/login" method="POST" class="container needs-validation w-75" style="max-width: 500px; margin-top: 20%">
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input type="text" class="form-control" require id="username" required name="username">
+    </div>
+    <p></p>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" class="form-control" id="password" required name="password"> 
+    </div>
+    <p></p>
+      <button type="submit" class="btn btn-primary">Login</button> 
+      <script>
+        var socket = io();
 
-<form action="/login" method="POST" class="needs-validation">
-  <div class="form-group">
-    <label for="username">Username</label>
-    <input type="text" class="form-control" require id="username" name="username">
+        var username = document.getElementById("username");
+        var form = document.getElementById("login");
+        form.addEventListener("submit", (e) => {
+          document.cookie = username.value;
+          socket.emit('user', document.getElementById('username').value)
+        })
+      </script>
+  </form>
+  <div class="container-fluid" style="margin-left: 10%; margin-top: 50px;">
+    <p class="alert alert-danger" id="fail" style="display: none;">
+      <strong>Failure:</strong> Incorrect login, please try again.
+    </p>
+    <script>
+      var fail = "<%= fail %>"
+      if(fail == "false") {
+        document.getElementById('fail').style.display = "inline";
+      }
+    </script>
   </div>
-  <p></p>
-  <div class="form-group">
-    <label for="password">Password</label>
-    <input type="password" class="form-control" id="password" required name="password"> 
-  </div>
-  <p></p>
-    <button type="submit" class="btn btn-primary">Submit</button> 
-    <a href="/register" class="btn btn-success" role="button">Register</a>
-</form> 
-
-
-
-
+</div> 
+<p></p>
