@@ -103,4 +103,4 @@ socket.on("joinRoom", ({ username, room}) =>{
 > Download repository to folder. Need to have dependencies, these can be found in the package.json file. If you need to install those, use 'npm install xxxxx'. 
 (Where xxxxx is the name of a dependency, Ex: 'npm install mongoose'.)
 
->The actual software is started by typing nodemon index.js
+>The actual software is started by typing 'nodemon index.js'
