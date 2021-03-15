@@ -9,7 +9,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Czat - "<%= username %>"</title>
+    <title>Czat - <%= username %></title>
     <h1 class="bg-dark text-light" style="padding: 20px">Czat</h1> 
     <style>
       body {
@@ -47,36 +47,36 @@
               <a class="nav-link" data-toggle="tab" href="#Contacts">Contacts</a>
             </li>
           </ul>
-          <div class="tab-content">
+          <div class="tab-content overflow-auto">
             <div class="tab-pane active container-fluid" id="Groups">
-              <ul class="nav flex-column button" id="grp-btn" style="position:relative; max-width: 50%;">
-                <li class="nav-item p-2">
-                  <a class="nav-link btn btn-outline-danger" href="#Global" id="room1">Global</a>
+              <ul class = "grp p-1" form="input nav flex-column button" type="submit" id="grp-btn" style="position:relative; max-width: 50%; list-style: none; max-width: px">
+                <li class="nav-item p-1">
+                  <a class="nav-link btn btn-outline-danger active" type="submit" href="#Global" id="Global">Global</a>
                 </li>
-                <li class="nav-item p-2">
-                  <a class="nav-link btn btn-outline-danger" href="#CSBoiz" id="room2">CSBoiz</a>
+                <li class="nav-item p-1">
+                  <a class="nav-link btn btn-outline-danger" href="#CSBoiz" id="CSBoiz">CSBoiz</a>
                 </li>
-                <li class="nav-item p-2">
-                  <a class="nav-link btn btn-outline-danger" href="#RustyNoobs" id="room3">RustyNoobs</a>
+                <li class="nav-item p-1">
+                  <a class="nav-link btn btn-outline-danger" href="#RustyNoobs" id="RustyNoobs">RustyNoobs</a>
                 </li>
-                <li class="nav-item p-2">
-                  <a class="nav-link btn btn-outline-danger" href="#Friends" id="room4">Friends</a>
+                <li class="nav-item p-1">
+                  <a class="nav-link btn btn-outline-danger" href="#Friends" id="Friends">Friends</a>
                 </li>
 
               </ul>
               <div class="form-inline" style="position: absolute; bottom: 1px">
-                <button type="button" class="btn btn-success d-flex">
+                <button type="button" class="btn btn-success d-flex" data-toggle="modal" data-target="#addGroup">
                   Add New Group
                 </button>
-                <button type="button" class="btn btn-dark d-flex ml-4" style="position: relative; bottom: 1px">
+                <button type="button" class="btn btn-secondary d-flex ml-4"  data-toggle="modal" data-target="#remGroup" style="position: relative; bottom: 1px">
                   Remove Group
                 </button>
               </div>
             </div>
-            <div class="tab-pane container-fluid" id="Contacts">
-
+            <div class="tab-pane container-fluid w-50" id="Contacts">
+              <ul class="float-right" id="Contacts" style="list-style: none; max-width: px">
+              </ul>
             </div>
-
           </div>  
           <div class="modal" id="profile">
             <div class="modal-dialog">
@@ -99,8 +99,52 @@
               </div>
             </div>
           </div>
+          <div class="modal" id="addGroup">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                  <h4 class="modal-title">
+                    Group Name:
+                    <form class="container-fluid form-inline" id="group-form" action="">
+                      <input class="form-control p-1 m-1 " type="text" id="txt" required pattern="\S+" />
+                      <button class="btn btn-primary" type="button">Add Group</button>
+                    </form>
+                  </h4>
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal" id="remGroup">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                  <h4 class="modal-title">
+                    Sorry! Not Implemented.
+                    <form class="container-fluid form-inline" id="group-rem" action="">
+                      <input class="form-control p-1 m-1 " type="text" id="txt" required pattern="\S+" />
+                      <button class="btn btn-primary disabled" type="button">
+                        <span class="spinner-grow spinner-grow-sm"></span>
+                        Remove Group
+                      </button>
+                    </form>
+                  </h4>
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-
         <div class="container-fluid col-sm-8 border-left" style="max-height: 98%;">
           <div>
             <h2 class="bg-danger text-light" style="padding: 20px">Messages</h2> 
@@ -134,52 +178,91 @@
 
             const socket = io()
 
+            //socket.emit("loadGroup");
+
+            socket.on('allUsers', (data) => {
+              data.map((d) => {
+                listUsers(d.username)
+              })
+            })
+
+            function listUsers(user) {
+              var li = document.createElement('li');
+              
+              li.classList.add("nav-item", "p-1");
+              li.style = ("list-style: none;")
+              var a = document.createElement('a');
+              a.classList.add("nav-link", "btn", "btn-outline-primary");
+              a.style = ("")
+              a.innerText = user;
+              a.id = user;
+              li.appendChild(a);
+              
+              document.getElementById("Contacts").appendChild(li);
+              jQuery("#grp-btn .btn").click(function(){
+                jQuery("#grp-btn .btn").removeClass('active');
+                jQuery(this).toggleClass('active'); 
+              });
+            }
+            
+            socket.on("loadRoom", function(data) {
+              data.map((d) => {
+                  makeRoom(d.name);
+                })
+              })
+
             var form = document.getElementById('form');
             var input = document.getElementById('msg');
+            var group = document.getElementById("grp-btn");
+            var newGroup = document.getElementById("group-form");
 
-            var room;
+            var room = "Global";
+            while(messages.firstChild)
+            {
+              messages.removeChild(messages.firstChild);
+            }
+            socket.emit('loadRoom', room);
+            socket.emit('joinRoom', { username, room })
 
-            document.getElementById("room1").addEventListener("click", function() {
-              room = "Global";
+            group.addEventListener("click", function(e) {
+              e.preventDefault;
+              
+              room = e.target.id;
+              console.log(room);
               while(messages.firstChild)
               {
                 messages.removeChild(messages.firstChild);
               }
               socket.emit('loadRoom', room);
               socket.emit('joinRoom', { username, room })
-              
             })
-            document.getElementById("room2").addEventListener("click", function() {
-              room = "CSBoiz";
-              while(messages.firstChild)
-              {
-                messages.removeChild(messages.firstChild);
-              }
-              socket.emit('loadRoom', room);
-              socket.emit('joinRoom', { username, room })
+
+            newGroup.addEventListener("submit", function(e) {
+              e.preventDefault;
+              let txt = e.target.elements.txt.value;
+              console.log(txt);
+              makeRoom(txt);
               
+              e.target.elements.txt.value = '';
+              socket.emit("group", txt);
             })
-            document.getElementById("room3").addEventListener("click", function() {
-              room = "RustyNoobs";
-              while(messages.firstChild)
-              {
-                messages.removeChild(messages.firstChild);
-              }
-              socket.emit('loadRoom', room);
-              socket.emit('joinRoom', { username, room })
-              
-            })
-            document.getElementById("room4").addEventListener("click", function() {
-              room = "Friends";
-              while(messages.firstChild)
-              {
-                messages.removeChild(messages.firstChild);
-              }
-              socket.emit('loadRoom', room);
-              socket.emit('joinRoom', { username, room })
-              
-            })
-            
+
+            function makeRoom(txt) {
+              const li = document.createElement('li');
+              li.classList.add("nav-item", "p-1", "m-0"); 
+              var a = document.createElement('a')
+              a.classList.add("nav-link", "btn", "btn-outline-danger")
+              a.innerText = txt;
+              a.ref = `#${txt}`;
+              a.id = txt;
+              li.appendChild(a);
+              document.getElementById("grp-btn").appendChild(li);
+              jQuery("#grp-btn .btn").click(function(){
+                jQuery("#grp-btn .btn").removeClass('active');
+                jQuery(this).toggleClass('active'); 
+              });
+            }
+
             socket.on('load', ({ data, room }) => {
               data.map((d) => {
                 if(d.name == room)
@@ -196,13 +279,12 @@
               let msg = e.target.elements.msg.value;
               msg = msg.trim();
               if (msg) {
-                //socket.emit('chat message', { msg, room });
-                socket.emit('group', { msg, room });
+                socket.emit('chat message', { msg, room });
+                //socket.emit('group', { msg, room });
                 e.target.elements.msg.value = '';
                 e.target.elements.msg.focus();
               }
             });
-
 
             socket.on('message', function(msg) {
               outputMessage(msg)
@@ -217,19 +299,23 @@
             function outputMessage(message) {
               const div = document.createElement('li');
               if(message.username == username) {
-                div.style = "text-align: right; float: right; border-radius: 8px; max-width: px; position: relative; right: 0px; background-color: rgba(0, 100, 255, 0.7); border: none;color: black;padding: 10px 10px;text-decoration: none;font-size: 16px;margin: 4px 2px;cursor: pointer;";
+                div.classList.add("btn", "btn-primary")
+                div.style = ("text-align: right; float: right; max-width: px; border-radius: 16px; max-height: 80px;")
+                //div.style = "text-align: right; float: right; border-radius: 8px; max-width: px; position: relative; right: 0px; background-color: rgba(0, 100, 255, 0.7); border: none;color: black;padding: 10px 10px;text-decoration: none;font-size: 16px;margin: 4px 2px;cursor: pointer;";
               }
               else if(message.username == "Czat Bot: ") {
-                div.style = "text-align: left; float: left; border-radius: 8px; max-width: px; position: relative; right: 0px; background-color: rgb(43, 43, 43); border: none;color: white;padding: 10px 10px;text-decoration: none;font-size: 16px;margin: 4px 2px;cursor: pointer;";
+                div.classList.add("btn", "btn-dark")
+                div.style = ("text-align: left; float: left; max-width: px; border-radius: 16px; max-height: 80px;")
               }
               else {
-                div.style = "text-align: left; float: left; border-radius: 8px; max-width: px; position: relative; right: 0px; background-color: #4CAF50; border: none;color: black;padding: 10px 10px;text-decoration: none;font-size: 16px;margin: 4px 2px;cursor: pointer;";
+                div.classList.add("btn", "btn-success")
+                div.style = ("text-align: left; float: left; max-width: px; border-radius: 16px; max-height: 80px;")
               }
               
               div.classList.add('messages');
               const p = document.createElement('p');
-              p.classList.add('meta');
-              p.innerText = message.username;
+              p.classList.add('meta', "card-title");
+              p.innerText = message.username + "";
               p.innerHTML += `<span> ${message.time}</span>`;
               div.appendChild(p);
               const para = document.createElement('p');
@@ -237,7 +323,7 @@
               para.innerText = message.text;
               div.appendChild(para);
               messages.appendChild(div);
-              messages.innerHTML += `<li><br></br><br></br></li>`
+              messages.innerHTML += `<li><br></br><br></li>`
             }
 
             function outputRoomName(room) {

@@ -4,15 +4,6 @@ const groupSchema = new mongoose.Schema({
   name: {
     type: String
   },
-  username: {
-    type: String
-    },
-  text: {
-    type: String
-  },
-  time: {
-    type: String
-  },
   
   },
     {

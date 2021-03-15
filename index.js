@@ -21,6 +21,7 @@ const {
 } = require("./utils/users");
 const { time } = require("console");
 const Group = require("./model/Group");
+const { data } = require("jquery");
 
 require("dotenv").config();
 
@@ -145,17 +146,24 @@ io.on('connection', (socket) => {
   console.log('user connected');
 
   // loads data from the database to be emitted using socket.io
-  socket.on("loadMessage", function() {
-    Message.find((err, data) => {
-      if(err)
-        console.log(err)
-      else
-        socket.emit('load', data)
-    });
+
+  User.find((err, data) => {
+    if(err)
+      console.log(err);
+    else
+      socket.emit('allUsers', data);
   })
 
+  Group.find((err, data) => {
+    if(err)
+      console.log(err)
+    else
+      socket.emit('loadRoom', data)
+  })
+
+
   socket.on("loadRoom", function(room) {
-    Group.find((err, data) => {
+    Message.find((err, data) => {
       if(err)
         console.log(err)
       else
@@ -203,26 +211,21 @@ io.on('connection', (socket) => {
 
   socket.on('chat message', ( {msg, room} ) => {
     const user = getCurrentUser(socket.id);
-    console.log("user: " + user.username + " room: " + room +' message: ' + msg);
+    console.log("user: " + user.username + " room: " + user.room);
     io.to(room).emit('message', formatMessage(user.username, msg));
     var message = formatMessage(user.username, msg);
     const newMessage = new Message({
+      name: room,
       username: message.username,
-      message: message.text,
+      text: message.text,
       time: message.time,
     });
     newMessage.save();
   });
 
-  socket.on("group", ({ msg, room }) => {
-    const user = getCurrentUser(socket.id);
-    var message = formatMessage(user.username, msg);
-    io.to(room).emit('message', formatMessage(user.username, msg));
+  socket.on("group", (room) => {
     const newGroup = new Group({
       name: room,
-      username: message.username,
-      text: message.text,
-      time: message.time,
     })
     newGroup.save();
   })
