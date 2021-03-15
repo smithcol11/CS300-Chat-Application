@@ -39,7 +39,7 @@ module.exports = User;
 
 >Index.ejs
 
-```
+```EJS
 <form id="login" action="/login" method="POST" class="container needs-validation w-75" style="max-width: 500px; margin-top: 20%">
     <div class="form-group">
       <label for="username">Username</label>
@@ -67,7 +67,7 @@ module.exports = User;
 
 >index.js
 
-```
+```JavaScript
 socket.on("joinRoom", ({ username, room}) =>{
     const userF = userExit(socket.id);
     if (userF) {
