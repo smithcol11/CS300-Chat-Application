@@ -85,6 +85,7 @@ app.get("/index-Czat", function(req, res) {
 app.get("/login", function(req, res) {
   var temp = true;
   res.render("login", {fail: temp});
+
 });
 
 app.get("/login-fail", function(req, res) {
@@ -101,6 +102,8 @@ app.post("/login", passport.authenticate("local", {
   failureRedirect: "/login-fail"
 }),
   function(req, res) {
+    res.sendStatus(401)
+    res.send("Not authorized user")
 });
 
 app.get("/register", function(req, res) {
