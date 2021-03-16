@@ -53,13 +53,13 @@
     <p></p>
       <button type="submit" class="btn btn-primary">Login</button> 
       <script>
-        var socket = io();
 
         var username = document.getElementById("username");
         var form = document.getElementById("login");
         form.addEventListener("submit", (e) => {
           document.cookie = username.value;
-          socket.emit('user', document.getElementById('username').value);
+          //socket.emit('user', document.getElementById('username').value);
+          
         })
       </script>
   </form>

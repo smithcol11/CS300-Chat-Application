@@ -31,9 +31,9 @@
     <div class="container-fluid" style="position: relative; top: -8px; width: 100%; padding: 0; ">
       <div class="row " style="height: 89%; max-height: 89%; margin-bottom: 0;">
         <div class="col-lg-4 d-flex flex-column flex-grow" style="margin-right: -30px;">
-          <ul class="nav nav-tabs">
+          <ul class="nav nav-tabs" style="background-color: rgba(0, 0, 0, 0.925);">
             <div>
-              <button type="button" class="nav-item btn btn-danger shadow" data-toggle="modal" data-target="#profile">
+              <button type="button" class="nav-item btn btn-danger shadow" data-toggle="modal" data-target="#profile" style="height: 100%;">
                 <%= username %>
               </button>
             </div>
@@ -45,14 +45,10 @@
               <a class="nav-link" data-toggle="tab" href="#Contacts">Contacts</a>
             </li>
           </ul>
-          <div class="tab-content overflow-auto">
-            <div class="tab-pane active container-fluid  overflow-auto" id="Groups" style="width: 100%;">
+          <div class="tab-content overflow-auto" style="height: 100%;">
+            <div class="tab-pane active container-fluid  overflow-auto" id="Groups" style="width: 100%; height: 100%;">
               <div class = "grp btn-group-vertical shadow" form="input nav flex-column" type="submit" id="grp-btn" style="width: 100%; margin-top: 10px;">
                 <a class="nav-link btn btn-outline-danger active text-dark" type="submit" href="#Global" id="Global">Global</a>
-                <a class="nav-link btn btn-outline-danger text-dark" href="#CSBoiz" id="CSBoiz">CSBoiz</a>
-                <a class="nav-link btn btn-outline-danger text-dark" href="#RustyNoobs" id="RustyNoobs">RustyNoobs</a>
-                <a class="nav-link btn btn-outline-danger text-dark" href="#Friends" id="Friends">Friends</a>
-
               </div>
               <div class="form-inline" style="position: absolute; bottom: -1px">
                 <button type="button" class="btn btn-dark d-flex shadow" data-toggle="modal" data-target="#addGroup">
@@ -63,9 +59,15 @@
                 </button>
               </div>
             </div>
-            <div class="tab-pane container-fluid overflow-auto" id="Contacts" >
+            <div class="tab-pane container-fluid overflow-auto" id="Contacts" style="height: 100%;" >
               <p></p>
               <div class="btn-group-vertical shadow " id="Contact" style="width: 100%;">
+              </div>
+              <p></p>
+              <h3 class ="p-3 text-center" style="width: 100%;">Online Users:</h3>
+              <div class="container-fluid w-100 overflow-auto" id="grp-btn">
+                
+                <div class="btn-group-vertical shadow " id="Online" style="width: 100%;"></div>
               </div>
             </div>
           </div>  
@@ -127,7 +129,7 @@
         </div>
         <div class="container col-sm-8 border-left" style="max-height: 100%;">
           <div>
-            <h3 class="bg-danger text-light text-center" style="padding: 4px; margin-left: -15px; margin-right: -15px;">Messages</> 
+            <h3 class="bg-danger text-light text-center" style="padding: 4px; margin-left: -16px; margin-right: -15px;">Messages</> 
           </div>
           <div class="chat-messages border-bottom" style="overflow: auto; position: relative; top: -8px; margin-left: -15px; margin-right: -15px;">
             <ul class="messages" id="messages"  style="overflow: auto; height: 85%;"></ul>
@@ -151,8 +153,6 @@
 
             const socket = io()
 
-            //socket.emit("loadGroup");
-
             socket.on('allUsers', (data) => {
               data.map((d) => {
                 listUsers(d.username)
@@ -160,20 +160,16 @@
             })
 
             function listUsers(user) {
-              //var li = document.createElement('a');
-              
-              //li.classList.add("nav-item", "p-1", "align-center");
-              //li.style = ("list-style: none; text-align: center")
               var a = document.createElement('div');
-              a.classList.add("text-dark", "btn", "btn-outline-danger", "p-2");
+              a.classList.add("text-dark", "nav-link", "btn", "btn-outline-danger", "p-2");
               a.style = ("text-align: center")
+              a.onclick = function() {PM(a.id)};
               a.innerText = user;
               a.id = user;
-              //li.appendChild(a);
               
               document.getElementById("Contact").appendChild(a);
-              jQuery("#grp-btn .btn").click(function(){
-                jQuery("#grp-btn .btn").removeClass('active');
+              jQuery("#Contacts .btn").click(function(){
+                jQuery("#Contacts .btn").removeClass('active');
                 jQuery(this).toggleClass('active'); 
               });
             }
@@ -181,15 +177,44 @@
             socket.on("loadRoom", function(data) {
               data.map((d) => {
                   makeRoom(d.name);
-                })
               })
+            })
+
+            socket.on("onlineUsers", (onlineUser) => {
+              listOnline(onlineUser);
+            })
+
+            function listOnline(user) {
+              var a = document.createElement('div');
+              a.classList.add("text-dark", "nav-link", "btn", "btn-outline-success", "p-2");
+              a.style = ("text-align: center")
+              a.onclick = function() {PM(a.id)};
+              a.innerText = user;
+              var name = (user + "online");
+              a.name = name;
+              a.id = user;
+              console.log(a.name);
+              document.getElementById("Online").appendChild(a);
+              jQuery("#Online .btn").click(function(){
+                jQuery("#Online .btn").removeClass('active');
+                jQuery(this).toggleClass('active'); 
+              })
+            }
+
+            socket.on("Offline", (user) => {
+              
+              var name = (user + "online");
+              console.log(name)
+              var div = document.getElementById(name);
+
+              div.remove();
+            })
 
             var form = document.getElementById('form');
             var remGroup = document.getElementById('group-rem');
             var group = document.getElementById("grp-btn");
             var newGroup = document.getElementById("group-form");
             
-
             var room = "Global";
             while(messages.firstChild)
             {
@@ -197,6 +222,7 @@
             }
             socket.emit('loadRoom', room);
             socket.emit('joinRoom', { username, room })
+            //socket.emit("Online", username);
 
             group.addEventListener("click", function(e) {
               e.preventDefault;
@@ -320,6 +346,22 @@
               div.appendChild(para);
               messages.appendChild(div);
               messages.innerHTML += `<li><br></br><br></li>`
+            }
+
+            function PM(otherUser) {
+              console.log(otherUser);
+              while(messages.firstChild)
+              {
+                messages.removeChild(messages.firstChild);
+              }
+              var PR;
+              if(username < otherUser) 
+                PR = (username + otherUser);
+              else 
+                PR = (otherUser + username);
+              socket.emit('loadRoom', PR);
+              console.log(PR);
+              socket.emit('privateRoom', otherUser)
             }
 
             function outputRoomName(room) {

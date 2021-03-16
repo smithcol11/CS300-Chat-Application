@@ -17,7 +17,10 @@ const {
   getCurrentUser,
   userJoin, 
   userExit,
-  getRoomUser 
+  getRoomUser, 
+  getUserSocket,
+  privateRoom,
+  getUsers
 } = require("./utils/users");
 const { time } = require("console");
 const Group = require("./model/Group");
@@ -148,6 +151,14 @@ io.on('connection', (socket) => {
 
   console.log('user connected');
 
+  var users = getUsers();
+  socket.on("Online", (user) => {
+    for(var i = 0; users[i] != null; i++) {
+      console.log(users[i])
+      io.emit("onlineUsers", users[i].username);
+    }
+  })
+  
   // loads data from the database to be emitted using socket.io
 
   User.find((err, data) => {
@@ -188,6 +199,30 @@ io.on('connection', (socket) => {
     
   })
 
+  socket.on("privateRoom", (otherUser) => {
+    const sender = getCurrentUser(socket.id);
+    console.log("user: " + sender.username + " room: " + sender.room);
+    //const reciever = getUserSocket(otherUser);
+    const room = privateRoom(sender.username, otherUser);
+    const user = userJoin(socket.id, sender.username, room); 
+    const userF = userExit(socket.id);
+    if (userF) {
+      console.log("user: " + userF.username + " room: " + userF.room);
+      socket.leave(userF.room);
+      socket.broadcast.to(userF.room).emit('message',formatMessage(bot, `${userF.username} has left the chat`));
+    }
+    socket.join(room);
+    console.log("user: " + user.username + " room: " + user.room);
+    socket.emit("message", formatMessage(bot,"Welcome to Czat"));
+    socket.broadcast.to(room).emit("message", formatMessage(bot, `${user.username} has joined the chat.`));
+  })
+
+  socket.on("PM", (message) => {
+    const user = getCurrentUser(socket.id);
+    const room = user.room;
+    io.to(room).emit("message", formatMessage(user.username, message));
+  })
+
   var bot = 'Czat Bot: ';
 
   /*io.use((socket, next) => {
@@ -196,7 +231,7 @@ io.on('connection', (socket) => {
     next();
   })*/
 
-  const users = [];
+  
   socket.on("user", function(data) {
     socket.emit("user", data);
     console.log("username: " + data);
@@ -207,7 +242,6 @@ io.on('connection', (socket) => {
       users.push(data);
       socket.emit('userSet', {username: data})
     }
-
   })
 
   socket.on("joinRoom", ({ username, room}) =>{
@@ -229,10 +263,11 @@ io.on('connection', (socket) => {
   socket.on('chat message', ( {msg, room} ) => {
     const user = getCurrentUser(socket.id);
     console.log("user: " + user.username + " room: " + user.room);
-    io.to(room).emit('message', formatMessage(user.username, msg));
+    const userRoom = user.room;
+    io.to(userRoom).emit('message', formatMessage(user.username, msg));
     var message = formatMessage(user.username, msg);
     const newMessage = new Message({
-      name: room,
+      name: userRoom,
       username: message.username,
       text: message.text,
       time: message.time,
@@ -250,6 +285,7 @@ io.on('connection', (socket) => {
   
   socket.on('disconnect', () => {
     const user = userExit(socket.id);
+    //io.emit("Offline", user.username)
 
     if (user) {
       socket.leave(user.room);

@@ -8,6 +8,14 @@ function userJoin(id, username, room) {
   return user;
 }
 
+function getUsers() {
+  return users;
+}
+
+function getUserSocket(user) {
+  return users.find(user => user.username === user)
+}
+
 function getCurrentUser(id) {
   return users.find(user => user.id === id);
 }
@@ -24,9 +32,17 @@ function getRoomUser(room) {
   return users.filter(user => user.room === room);
 }
 
+function privateRoom(username, otherUsername) {
+  if(username < otherUsername) return (username + otherUsername);
+  else return (otherUsername + username)
+}
+
 module.exports = {
   getCurrentUser,
   getRoomUser,
   userJoin,
-  userExit
+  userExit,
+  getUserSocket,
+  privateRoom,
+  getUsers
 }
