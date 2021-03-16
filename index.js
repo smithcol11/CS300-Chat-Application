@@ -164,6 +164,19 @@ io.on('connection', (socket) => {
       socket.emit('loadRoom', data)
   })
 
+  socket.on("delRoom", function(room) {
+    var myQuery = { name: room }
+    Group.deleteOne(myQuery, function(err, obj) {
+      if(err) throw(err);
+      console.log(room + " was removed")
+      //const userF = userExit(socket.id);
+        //if (userF) {
+        //socket.leave(room);
+      //}
+      io.emit("goHome", room);
+    })
+  })
+
 
   socket.on("loadRoom", function(room) {
     Message.find((err, data) => {
@@ -198,6 +211,7 @@ io.on('connection', (socket) => {
   })
 
   socket.on("joinRoom", ({ username, room}) =>{
+    console.log(`${room}`)
     const userF = userExit(socket.id);
     if (userF) {
       console.log("user: " + userF.username + " room: " + userF.room);
@@ -231,6 +245,7 @@ io.on('connection', (socket) => {
       name: room,
     })
     newGroup.save();
+    io.emit("reload", room)
   })
   
   socket.on('disconnect', () => {
