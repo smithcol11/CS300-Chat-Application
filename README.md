@@ -39,11 +39,7 @@ module.exports = User;
 
 >Index.ejs
 
-<<<<<<< HEAD
 ```html
-=======
-```EJS
->>>>>>> e27713eae44f92e5771cae5c19ea9b75ec7721be
 <form id="login" action="/login" method="POST" class="container needs-validation w-75" style="max-width: 500px; margin-top: 20%">
     <div class="form-group">
       <label for="username">Username</label>
