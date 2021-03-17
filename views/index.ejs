@@ -1,3 +1,5 @@
+<!--Includes all my src's, this also has link to bootcamp 4.5.2, which is how I use 'class=" "'-->
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -10,11 +12,14 @@
 <html>
   <head>
     <title>Czat - <%= username %></title>
+    <!--First sections contain the header and some CSS styling-->
     <h1 class=" text-light" style="padding: 20px; background-color: rgba(0, 0, 0, 0.925);">Czat</h1> 
+    <!--I actually do most of my styling inline, which I later learned is frowned upon?-->
     <style>
       body {
         padding: 0px;
       }
+      /* tab and button .active are used to keep the highlight from me clicking the object */
       tab.active{
           background:rgba(255, 0, 0, 0.548);
       }
@@ -22,6 +27,7 @@
           background:rgba(255, 254, 254, 0.541);
       }
 
+      /* old socket.io CSS, unused at this point */
       #messages { list-style-type: none; margin: 0; padding: 0; flex-grow: 1; }
       #messages > li { padding: 0.5rem 1rem; }
       
@@ -29,15 +35,18 @@
   </head>
   <body style="margin-bottom: 0px;">
     <div class="container-fluid" style="position: relative; top: -8px; width: 100%; padding: 0; ">
+      <!--First I split the entire page into sections of 1/3 and 2/3 using row-->
+      <!--Had to set height to 89 or strange things would happen with my overflow-auto's in doc-->
       <div class="row " style="height: 89%; max-height: 89%; margin-bottom: 0;">
         <div class="col-lg-4 d-flex flex-column flex-grow" style="margin-right: -30px;">
           <ul class="nav nav-tabs" style="background-color: rgba(0, 0, 0, 0.925);">
             <div>
+              <!--Button to open User modal-->
               <button type="button" class="nav-item btn btn-danger shadow" data-toggle="modal" data-target="#profile" style="height: 100%;">
                 <%= username %>
               </button>
             </div>
-            
+            <!--Nav tab options-->
             <li class="nav-item" style="margin-left: 50px;">
               <a class="nav-link active" data-toggle="tab" href="#Groups">Groups</a>
             </li>
@@ -45,32 +54,39 @@
               <a class="nav-link" data-toggle="tab" href="#Contacts">Contacts</a>
             </li>
           </ul>
-          <div class="tab-content overflow-auto" style="height: 100%;">
+          <div class="tab-content" style="height: 100%;">
+            <!--First tab pane, contains Group information, uses verticle button groups-->
             <div class="tab-pane active container-fluid  overflow-auto" id="Groups" style="width: 100%; height: 100%;">
+              <!--New and removed groups are added as a child to the div as an <a>-->
               <div class = "grp btn-group-vertical shadow" form="input nav flex-column" type="submit" id="grp-btn" style="width: 100%; margin-top: 10px;">
                 <a class="nav-link btn btn-outline-danger active text-dark" type="submit" href="#Global" id="Global">Global</a>
               </div>
               <div class="form-inline" style="position: absolute; bottom: -1px">
+                <!--Add group button-->
                 <button type="button" class="btn btn-dark d-flex shadow" data-toggle="modal" data-target="#addGroup">
                   Add New Group
                 </button>
+                <!--Delete group button, these both open Modal's with more info.-->
                 <button type="button" class="btn btn-danger shadow d-flex ml-4"  data-toggle="modal" data-target="#remGroup" style="position: relative; bottom: 1px">
                   Remove Group
                 </button>
               </div>
             </div>
-            <div class="tab-pane container-fluid overflow-auto" id="Contacts" style="height: 100%;" >
+            <!--Other tab, contains contacts which is all users, and active users-->
+            <div class="tab-pane container-fluid" id="Contacts" style="height: 100%;" >
               <p></p>
-              <div class="btn-group-vertical shadow " id="Contact" style="width: 100%;">
+              <!--This is where users are added of tag <a>-->
+              <div class="btn-group-vertical shadow overflow-auto" id="Contact" style="width: 100%; max-height: 89%;">
               </div>
               <p></p>
-              <h3 class ="p-3 text-center" style="width: 100%;">Online Users:</h3>
+              <h3 class ="p-3 text-center" style="width: 100%; max-height: 25%;">Online Users:</h3>
               <div class="container-fluid w-100 overflow-auto" id="grp-btn">
-                
+                <!--This is where active users are added and removed tag <a>-->
                 <div class="btn-group-vertical shadow " id="Online" style="width: 100%;"></div>
               </div>
             </div>
-          </div>  
+          </div>
+          <!--First modal, contains user profile data, basic for now with only a name and signout-->  
           <div class="modal" id="profile">
             <div class="modal-dialog">
               <div class="modal-content">
@@ -78,6 +94,7 @@
                   <h4 class="modal-title" style="margin-right: 20px;">
                     <%= username %>
                   </h4>
+                  <!--Signout button here-->
                   <a class="link btn btn-dark shadow" type="button" href="/logout">Sign Out</a>
                   <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
@@ -87,6 +104,8 @@
               </div>
             </div>
           </div>
+          <!--Second modal, this pulls up to type in and add groups,
+          Looks more clean than having multiple forms on main page-->
           <div class="modal" id="addGroup">
             <div class="modal-dialog">
               <div class="modal-content">
@@ -95,6 +114,7 @@
                     Group Name:
                     <form class="container-fluid form-inline" id="group-form" action="">
                       <input class="form-control p-1 m-1 " type="text" id="txt" action="" required pattern="\S+" />
+                      <!--Submit to add group name-->
                       <button class="btn btn-primary" type="button">Add Group</button>
                     </form>
                   </h4>
@@ -106,20 +126,21 @@
               </div>
             </div>
           </div>
+          <!--Final modal, this opens up a list of current groups that we can remove,
+          Used a cheeky way to remove, works well-->
           <div class="modal" id="remGroup">
             <div class="modal-dialog">
               <div class="modal-content">
-                <!-- Modal Header -->
                 <div class="modal-header">
                   <h4 class="modal-title">
                     Groups to Remove:
+                    <!--Click on group which is tag <a> to remove the group from both lists of groups-->
                     <div class="btn-group-vertical shadow" id="group-rem" style="list-style: none; width: 100%;">
                       
                     </div>
                   </h4>
                   <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
-                <!-- Modal footer -->
                 <div class="modal-footer">
                   <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
                 </div>
@@ -127,38 +148,50 @@
             </div>
           </div>
         </div>
+        <!--Beginning of the 2/3 portion of the page, contains everything related to messaging-->
         <div class="container col-sm-8 border-left" style="max-height: 100%;">
           <div>
+            <!--Header of messages-->
             <h3 class="bg-danger text-light text-center" style="padding: 4px; margin-left: -16px; margin-right: -15px;">Messages</> 
           </div>
           <div class="chat-messages border-bottom" style="overflow: auto; position: relative; top: -8px; margin-left: -15px; margin-right: -15px;">
+            <!--Messages are appended to this list-->
             <ul class="messages" id="messages"  style="overflow: auto; height: 85%;"></ul>
           </div>
+          <!--Input form for messages with submit button, won't submit if empty-->
           <form class="form-inline" id="form" action="" style="position: relative; bottom: -15px">
             <input class="form-control flex-grow-1" id="msg" type="text" autocomplete="off" style="margin-right: 5px;" />
             <button class="btn btn-primary" style="margin-right: 5px;">Send</button>
           </form>
         </div>
-
+          <!--Beginning of all the scripts
+          In hindsight, this file should end here
+          If I could, I would add all this code to multiple files depending on what it does.
+          These scripts include all client-server socket communication-->
           <script>
+            // jQuery is used to keep buttons highlighted using remove and toggle
             jQuery("#grp-btn .btn").click(function(){
               jQuery("#grp-btn .btn").removeClass('active');
               jQuery(this).toggleClass('active'); 
             });
-
+             
+            //username is grabbed from the cookie made earlier
             var username = document.cookie;
             
             var user = document.createElement('li');
             user.textContent = "<%= username %>";
 
+            //socket io as a const to use emit and on
             const socket = io()
 
+            // from index.js, adds all users to the contacts tab
             socket.on('allUsers', (data) => {
               data.map((d) => {
                 listUsers(d.username)
               })
             })
 
+            //function that is called from above to format and list users, created html code
             function listUsers(user) {
               var a = document.createElement('div');
               a.classList.add("text-dark", "nav-link", "btn", "btn-outline-danger", "p-2");
@@ -166,7 +199,7 @@
               a.onclick = function() {PM(a.id)};
               a.innerText = user;
               a.id = user;
-              
+              //getElementById is OP, I use it often for variables
               document.getElementById("Contact").appendChild(a);
               jQuery("#Contacts .btn").click(function(){
                 jQuery("#Contacts .btn").removeClass('active');
@@ -174,26 +207,32 @@
               });
             }
             
+            //Loads the room that is selected, from index.js which comes from MongoDB
             socket.on("loadRoom", function(data) {
               data.map((d) => {
-                  makeRoom(d.name);
+                  makeRoom(d.name); // function below a ways
               })
             })
 
+            // this is the socket that calls a function for online users.
             socket.on("onlineUsers", (onlineUser) => {
               listOnline(onlineUser);
             })
 
+            // formats html and adds it to the active users contacts list
             function listOnline(user) {
+              var isOnline = (user + "online")
+              var exists = document.getElementById(isOnline);
+              //if the user exists in the list, they aren't added again
+              if(exists != null) return;              
               var a = document.createElement('div');
               a.classList.add("text-dark", "nav-link", "btn", "btn-outline-success", "p-2");
               a.style = ("text-align: center")
-              a.onclick = function() {PM(a.id)};
+              a.onclick = function() {PM(a.name)};
               a.innerText = user;
-              var name = (user + "online");
+              var name = user
               a.name = name;
-              a.id = user;
-              console.log(a.name);
+              a.id = (user + "online");
               document.getElementById("Online").appendChild(a);
               jQuery("#Online .btn").click(function(){
                 jQuery("#Online .btn").removeClass('active');
@@ -201,20 +240,21 @@
               })
             }
 
+            //deletes the html code for users that logout
             socket.on("Offline", (user) => {
-              
               var name = (user + "online");
-              console.log(name)
               var div = document.getElementById(name);
-
+              //.remove will delete the entire element, in this case <a>
               div.remove();
             })
 
+            // these are some variables I use for sockets, documents, and event listeners
             var form = document.getElementById('form');
             var remGroup = document.getElementById('group-rem');
             var group = document.getElementById("grp-btn");
             var newGroup = document.getElementById("group-form");
             
+            //not wrapped as the default room is global, clears chat and places users there
             var room = "Global";
             while(messages.firstChild)
             {
@@ -222,13 +262,15 @@
             }
             socket.emit('loadRoom', room);
             socket.emit('joinRoom', { username, room })
-            //socket.emit("Online", username);
+            socket.emit("Online", username);
 
+            // On click from the group list, the user is moved to that group.
+            // hindsight, should have used onClick functions.
+            // eventListeners are tricky
             group.addEventListener("click", function(e) {
               e.preventDefault;
               
               room = e.target.id;
-              console.log(room);
               while(messages.firstChild)
               {
                 messages.removeChild(messages.firstChild);
@@ -237,24 +279,25 @@
               socket.emit('joinRoom', { username, room })
             })
 
+            // Submit from the message form, this emits the text to be displayed.
             newGroup.addEventListener("submit", function(e) {
               e.preventDefault;
               let txt = e.target.elements.txt.value;
-              console.log(txt);
-              
-              
               e.target.elements.txt.value = '';
               socket.emit("group", txt);
             })
 
+            // This calls function to relead room with new group history
             socket.on("reload", (txt) => {
               makeRoom(txt);
             })
 
-
+            //emit to index.js, then the room is removed from the DB
             function remRoom(txt) {
               socket.emit('delRoom', txt)
             }
+
+            // Deletes the html code for groups, uses remove twice to delete it from both lists.
             socket.on("goHome", (room) => {
               while(messages.firstChild)
               {
@@ -267,15 +310,13 @@
                   
             })
 
+            // makes the html for adding rooms, from DB and dynamically
             function makeRoom(txt) {
-              //const li = document.createElement('li');
-              //li.classList.add("nav-item", "p-1", "m-0", "align-center"); 
               var a = document.createElement('a')
               a.classList.add("nav-link", "btn", "btn-outline-danger", "text-dark")
               a.innerText = txt;
               a.ref = `#${txt}`;
               a.id = txt;
-              //li.appendChild(a);
               const a2 = a.cloneNode(true);
               a2.onclick = function() {remRoom(a.id)};
               document.getElementById("grp-btn").appendChild(a);
@@ -286,6 +327,8 @@
               });
             }
 
+            // This calls the output message function
+            // data comes from the database, if the room is correct, it sends it to the function
             socket.on('load', ({ data, room }) => {
               data.map((d) => {
                 if(d.name == room)
@@ -297,6 +340,8 @@
               })
             })
 
+            //on submit for the form, this will create the chat message and send it to 
+            //index.js and then the DB
             form.addEventListener('submit', function(e) {
               e.preventDefault();
               let msg = e.target.elements.msg.value;
@@ -309,6 +354,7 @@
               }
             });
 
+            //comes from index.js, this will call outputMessage
             socket.on('message', function(msg) {
               outputMessage(msg)
               messages.scrollTop = messages.scrollHeight;
@@ -319,6 +365,9 @@
               outputUsers(users);
             };*/
 
+            //OutputMessage will format the messages based on sender
+            // sender is the right with dif color, reciever is on the left
+            //Czat bot can also send messages
             function outputMessage(message) {
               const div = document.createElement('li');
               if(message.username == username) {
@@ -348,8 +397,9 @@
               messages.innerHTML += `<li><br></br><br></li>`
             }
 
+            //This code is executed when users want to send personal messages
+            //This is done by creating psuedo rooms with a combo of the usernames
             function PM(otherUser) {
-              console.log(otherUser);
               while(messages.firstChild)
               {
                 messages.removeChild(messages.firstChild);
@@ -360,14 +410,15 @@
               else 
                 PR = (otherUser + username);
               socket.emit('loadRoom', PR);
-              console.log(PR);
               socket.emit('privateRoom', otherUser)
             }
 
+            // These last two functions are unused, I display the rooms and users in other ways
             function outputRoomName(room) {
               roomName.innerText = room;
             }
 
+            // UNUSED
             function outputUsers(users) {
               userList.innerHTML = '';
               users.forEach((user) => {

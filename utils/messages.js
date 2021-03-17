@@ -1,5 +1,8 @@
+// I use this file to format messages into an object, this allows for many sections, including a date
+// moment to get the time
 const moment = require('moment');
 
+// formats the object to have three parts
 function formatMessage(username, text) {
   return {
     username,
@@ -8,6 +11,7 @@ function formatMessage(username, text) {
   };
 }
 
+// Unused function, I planned on using this, but actually don't
 function formatMessageDB(username, test, time)
 {
   return {
@@ -17,6 +21,7 @@ function formatMessageDB(username, test, time)
   };
 }
 
+// export to index.js
 module.exports = {
   formatMessage,
   formatMessageDB

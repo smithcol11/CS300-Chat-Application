@@ -1,3 +1,4 @@
+<!--Includes all my src's, this also has link to bootcamp 4.5.2, which is how I use 'class=" "'-->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -20,46 +21,57 @@
 
 <title>Czat - Login</title>
 
+<!--Header for the login Page-->
 <h1 class="text-light" style="background-color: rgba(0, 0, 0, 0.925);">Login</h1> 
 
+<!--Navbar similar to other pages, this shows all available pages-->
 <nav class="navbar navbar-expand-sm bg-danger navbar-dark" style="position: relative; top: -10px;">
   <ul class="navbar-nav">
     <li class="nav-item active">
       <a class="nav-link" href="/">Czat</a>
     </li>
     <li class="nav-item">
+      <!--Login page link-->
       <a class="nav-link" href="/login">Login</a>
     </li>
     <li class="nav-item">
+      <!--Register page link-->
       <a class="nav-link" href="/register">Register</a>
     </li>
     <li class="nav-item">
+      <!--About meme page doge to the moon-->
       <a class="nav-link" href="/about">About</a>
     </li>
   </ul>
 </nav>
 <p style="margin-top: 100px"></p>
+
+<!--Shadowed container that holds the login form-->
 <div class="container-fluid shadow-lg p-4 bg-white w-50 h-50 my-auto mx-auto" style="max-width: 500px;">
   <form id="login" action="/login" method="POST" class="container needs-validation w-75" style="max-width: 500px; margin-top: 20%">
+    <!--Username form-group, required-->
     <div class="form-group">
       <label for="username">Username</label>
       <input type="text" class="form-control" require id="username" required name="username">
     </div>
     <p></p>
+    <!--Password form group, also required-->
     <div class="form-group">
       <label for="password">Password</label>
       <input type="password" class="form-control" id="password" required name="password"> 
     </div>
     <p></p>
+      <!--Submit button, still inside form-->
       <button type="submit" class="btn btn-primary">Login</button> 
       <script>
-
+        // username entered into login form
         var username = document.getElementById("username");
         var form = document.getElementById("login");
+
+        // listens for the submit, could also use onClick function
         form.addEventListener("submit", (e) => {
+          //stores the value of the username into a cookie, this is to identify the user throughout the app
           document.cookie = username.value;
-          //socket.emit('user', document.getElementById('username').value);
-          
         })
       </script>
   </form>
@@ -68,6 +80,7 @@
       <strong>Failure:</strong> Incorrect login, please try again.
     </p>
     <script>
+      // upon failure to sign in, the user is displayed a banner, fail is passed from index.js
       var fail = "<%= fail %>"
       if(fail == "false") {
         document.getElementById('fail').style.display = "inline";
