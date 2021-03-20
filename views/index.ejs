@@ -17,7 +17,12 @@
     <!--I actually do most of my styling inline, which I later learned is frowned upon?-->
     <style>
       body {
-        padding: 0px;
+        background-color: #131516;
+        color: #d8d4cf;
+        filter: brightness(.9);
+        /*--darkreader-selection-background: #004daa;
+        --darkreader-selection-text: #e8e6e3;
+        padding: 0px; */
       }
       /* tab and button .active are used to keep the highlight from me clicking the object */
       tab.active{
@@ -30,6 +35,7 @@
       /* old socket.io CSS, unused at this point */
       #messages { list-style-type: none; margin: 0; padding: 0; flex-grow: 1; }
       #messages > li { padding: 0.5rem 1rem; }
+      
       
     </style>
   </head>
@@ -48,18 +54,18 @@
             </div>
             <!--Nav tab options-->
             <li class="nav-item" style="margin-left: 50px;">
-              <a class="nav-link active" data-toggle="tab" href="#Groups">Groups</a>
+              <a class="nav-link active" data-toggle="tab" style="color: #d8d4cf; background-color: #131516" href="#Groups">Groups</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" data-toggle="tab" href="#Contacts">Contacts</a>
+              <a class="nav-link" data-toggle="tab" style="color: #d8d4cf; background-color: #131516" href="#Contacts">Contacts</a>
             </li>
           </ul>
-          <div class="tab-content" style="height: 100%;">
+          <div class="tab-content border-top" style="height: 100%;">
             <!--First tab pane, contains Group information, uses verticle button groups-->
             <div class="tab-pane active container-fluid  overflow-auto" id="Groups" style="width: 100%; height: 100%;">
               <!--New and removed groups are added as a child to the div as an <a>-->
               <div class = "grp btn-group-vertical shadow" form="input nav flex-column" type="submit" id="grp-btn" style="width: 100%; margin-top: 10px;">
-                <a class="nav-link btn btn-outline-danger active text-dark" type="submit" href="#Global" id="Global">Global</a>
+                <a class="nav-link btn btn-outline-danger active" type="submit" href="#Global" id="Global" style="color: #d8d4cf">Global</a>
               </div>
               <div class="form-inline" style="position: absolute; bottom: -1px">
                 <!--Add group button-->
@@ -89,7 +95,7 @@
           <!--First modal, contains user profile data, basic for now with only a name and signout-->  
           <div class="modal" id="profile">
             <div class="modal-dialog">
-              <div class="modal-content">
+              <div class="modal-content" style="color: #d8d4cf; background-color: #131516">
                 <div class="modal-header">
                   <h4 class="modal-title" style="margin-right: 20px;">
                     <%= username %>
@@ -108,12 +114,12 @@
           Looks more clean than having multiple forms on main page-->
           <div class="modal" id="addGroup">
             <div class="modal-dialog">
-              <div class="modal-content">
+              <div class="modal-content" style="background-color: #131516">
                 <div class="modal-header">
                   <h4 class="modal-title">
                     Group Name:
                     <form class="container-fluid form-inline" id="group-form" action="">
-                      <input class="form-control p-1 m-1 " type="text" id="txt" action="" required pattern="\S+" />
+                      <input class="form-control p-1 m-1 " type="text" id="txt" action="" style="color: #d8d4cf; background-color: #131516" required pattern="\S+" />
                       <!--Submit to add group name-->
                       <button class="btn btn-primary" type="button">Add Group</button>
                     </form>
@@ -128,9 +134,9 @@
           </div>
           <!--Final modal, this opens up a list of current groups that we can remove,
           Used a cheeky way to remove, works well-->
-          <div class="modal" id="remGroup">
+          <div class="modal" id="remGroup" >
             <div class="modal-dialog">
-              <div class="modal-content">
+              <div class="modal-content" style="background-color: #131516">
                 <div class="modal-header">
                   <h4 class="modal-title">
                     Groups to Remove:
@@ -156,11 +162,11 @@
           </div>
           <div class="chat-messages border-bottom" style="overflow: auto; position: relative; top: -8px; margin-left: -15px; margin-right: -15px;">
             <!--Messages are appended to this list-->
-            <ul class="messages" id="messages"  style="overflow: auto; height: 85%;"></ul>
+            <ul class="messages" id="messages"  style="overflow: auto; height: 85%; background-color: #131516; color: #d8d4cf"></ul>
           </div>
           <!--Input form for messages with submit button, won't submit if empty-->
           <form class="form-inline" id="form" action="" style="position: relative; bottom: -15px">
-            <input class="form-control flex-grow-1" id="msg" type="text" autocomplete="off" style="margin-right: 5px;" />
+            <input class="form-control flex-grow-1" id="msg" type="text" autocomplete="off" style="margin-right: 5px; color: #d8d4cf; background-color: #131516" />
             <button class="btn btn-primary" style="margin-right: 5px;">Send</button>
           </form>
         </div>
@@ -194,8 +200,8 @@
             //function that is called from above to format and list users, created html code
             function listUsers(user) {
               var a = document.createElement('div');
-              a.classList.add("text-dark", "nav-link", "btn", "btn-outline-danger", "p-2");
-              a.style = ("text-align: center")
+              a.classList.add("nav-link", "btn", "btn-outline-danger", "p-2");
+              a.style = ("text-align: center; color: #d8d4cf")
               a.onclick = function() {PM(a.id)};
               a.innerText = user;
               a.id = user;
@@ -226,16 +232,16 @@
               //if the user exists in the list, they aren't added again
               if(exists != null) return;              
               var a = document.createElement('div');
-              a.classList.add("text-dark", "nav-link", "btn", "btn-outline-success", "p-2");
-              a.style = ("text-align: center")
+              a.classList.add("nav-link", "btn", "btn-outline-success", "p-2");
+              a.style = ("text-align: center; color: #d8d4cf")
               a.onclick = function() {PM(a.name)};
               a.innerText = user;
               var name = user
               a.name = name;
               a.id = (user + "online");
               document.getElementById("Online").appendChild(a);
-              jQuery("#Online .btn").click(function(){
-                jQuery("#Online .btn").removeClass('active');
+              jQuery("#Contacts .btn").click(function(){
+                jQuery("#Contacts .btn").removeClass('active');
                 jQuery(this).toggleClass('active'); 
               })
             }
@@ -313,7 +319,8 @@
             // makes the html for adding rooms, from DB and dynamically
             function makeRoom(txt) {
               var a = document.createElement('a')
-              a.classList.add("nav-link", "btn", "btn-outline-danger", "text-dark")
+              a.classList.add("nav-link", "btn", "btn-outline-danger")
+              a.style = ("color: #d8d4cf")
               a.innerText = txt;
               a.ref = `#${txt}`;
               a.id = txt;
@@ -371,16 +378,16 @@
             function outputMessage(message) {
               const div = document.createElement('li');
               if(message.username == username) {
-                div.classList.add("btn", "btn-dark", "shadow")
+                div.classList.add("btn", "btn-dark", "shadow", "border")
                 div.style = ("text-align: right; float: right; max-width: px; border-radius: 16px; max-height: 80px; margin-right: 10px")
               }
               else if(message.username == "Czat Bot: ") {
-                div.classList.add("btn", "btn-dark", "shadow-lg")
+                div.classList.add("btn", "btn-dark", "shadow-lg", "border")
                 div.style = ("text-align: left; float: left; max-width: px; border-radius: 16px; max-height: 80px; margin-left: 10px")
               }
               else {
-                div.classList.add("btn", "btn-light", "shadow")
-                div.style = ("text-align: left; float: left; max-width: px; border-radius: 16px; max-height: 80px; margin-left: 10px")
+                div.classList.add("btn", "btn-secondary", "shadow", "border")
+                div.style = ("text-align: left; float: left; max-width: px; border-radius: 16px; max-height: 80px; margin-left: 10px; ")
               }
               
               div.classList.add('messages');

@@ -13,6 +13,7 @@
   }
   body {
     padding: 0px;
+    background-color: #131516; color: #d8d4cf
   }
   form {
     margin-right: 75%;
@@ -47,18 +48,18 @@
 <p style="margin-top: 100px"></p>
 
 <!--Shadowed container that holds the login form-->
-<div class="container-fluid shadow-lg p-4 bg-white w-50 h-50 my-auto mx-auto" style="max-width: 500px;">
+<div class="container-fluid shadow-lg p-4 w-50 h-50 my-auto mx-auto" style="max-width: 500px; background-color: #131516; color: #d8d4cf">
   <form id="login" action="/login" method="POST" class="container needs-validation w-75" style="max-width: 500px; margin-top: 20%">
     <!--Username form-group, required-->
     <div class="form-group">
       <label for="username">Username</label>
-      <input type="text" class="form-control" require id="username" required name="username">
+      <input type="text" class="form-control" require id="username" required name="username" style="background-color: #131516; color: #d8d4cf">
     </div>
     <p></p>
     <!--Password form group, also required-->
     <div class="form-group">
       <label for="password">Password</label>
-      <input type="password" class="form-control" id="password" required name="password"> 
+      <input type="password" class="form-control" id="password" required name="password" style="background-color: #131516; color: #d8d4cf"> 
     </div>
     <p></p>
       <!--Submit button, still inside form-->
