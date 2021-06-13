@@ -1,4 +1,4 @@
-# PDXCzat
+# CS300 Chat Application
 # Czat - Software: Messaging App
 
 ## Introduction
