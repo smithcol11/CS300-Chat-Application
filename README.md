@@ -2,11 +2,10 @@
 # Czat - Software: Messaging App
 > A version of my software is hosted at Heroku if you want to check it out!
 
-> https://cs300-czat.herokuapp.com/
+> https://cs300-czat.herokuapp.com/ - Hosted at this link.
 ## Introduction
 
 > This is my first attempt at any sort of software development. This is for my CS300 course at PSU. Czat is an instant messaging app with many features that mainstream apps contain, such as user authentication, hosting, database access, group messaging, etc.
-> https://cs300-czat.herokuapp.com/ - Hosted at this link.
 
 ## Code Samples
 
